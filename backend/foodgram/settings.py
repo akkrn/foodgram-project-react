@@ -1,5 +1,4 @@
 import os
-from datetime import timedelta
 from pathlib import (
     Path,
 )
@@ -36,6 +35,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "django_filters",
+    'rest_framework.authtoken',
+    "djoser",
     "users",
     "recipes",
     "api",
@@ -54,7 +55,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "foodgram.urls"
 
-# TEMPLATES_DIR = os.path.join(BASE_DIR, "docs")
 TEMPLATES_DIR = BASE_DIR.parent / "docs"
 
 TEMPLATES = [
@@ -127,7 +127,6 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
-
 STATIC_ROOT = os.path.join(
     BASE_DIR,
     "collected_static",
@@ -143,24 +142,32 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination"
                                 ".PageNumberPagination",
     "PAGE_SIZE": 6,
 }
 
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
-    "AUTH_HEADER_TYPES": ("Bearer",),
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'HIDE_USER': 'True',
+    'SERIALIZERS': {
+        'user': 'api.v1.serializers.UserSerializer',
+    },
+    'PERMISSIONS': {'user': ('rest_framework.permissions.IsAuthenticated'),
+                    'user_delete': ('rest_framework.permissions.IsAdminUser'),
+                    },
 }
 
 AUTH_USER_MODEL = "users.User"
 
-
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+EMAIL_FILE_PATH = os.path.join(
+    BASE_DIR,
+    "sent_emails",
+)
 DEFAULT_FROM_EMAIL = "admin@example.com"
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"

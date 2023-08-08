@@ -12,9 +12,7 @@ class Tag(models.Model):
         DINNER = "dinner", _("Ужин")
 
     name = models.CharField(max_length=15, choices=TagChoice.choices)
-    color = models.CharField(
-        max_length=7, unique=True, verbose_name="Цветовой HEX-код"
-    )
+    color = models.CharField(max_length=7, unique=True, verbose_name="Цветовой HEX-код")
     slug = models.SlugField(
         unique=True,
     )
@@ -35,6 +33,7 @@ class Ingredient(models.Model):
         return self.name + " " + self.measure_unit
 
     class Meta:
+        ordering = ("name",)
         verbose_name = "Ингредиент"
         verbose_name_plural = "Ингредиенты"
 
@@ -45,16 +44,12 @@ class Recipe(models.Model):
         on_delete=models.CASCADE,
         related_name="comments",
         verbose_name="Автор",
-                               )
+    )
     name = models.CharField("Название рецепта", max_length=200)
     text = models.TextField("Описание рецепта")
     cooking_time = models.PositiveIntegerField("Время приготовления")
-    ingredients = models.ManyToManyField(
-        Ingredient, blank=True
-    )
-    tags = models.ManyToManyField(
-        Tag, blank=True
-    )
+    ingredients = models.ManyToManyField(Ingredient, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
     created = models.DateTimeField("Дата публикации", auto_now_add=True)
     image = models.ImageField("Картинка", upload_to="recipes/", blank=True)
 
@@ -76,7 +71,6 @@ class RecipeIngredient(models.Model):
         unique_together = ["recipe", "ingredient"]
         verbose_name = "Количество ингридиента"
         verbose_name_plural = "Количество ингредиентов"
-
 
 
 class Favorite(models.Model):
