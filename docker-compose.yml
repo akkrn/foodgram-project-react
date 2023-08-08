@@ -19,19 +19,3 @@ services:
       - media:/app/media/
     depends_on:
       - db
-  frontend:
-    env_file: .env
-    image: ${DOCKER_USERNAME}/kittygram_frontend
-    command: cp -r /app/build/. /static/
-    volumes:
-      - static:/static/
-  gateway:
-    build: ../foodgram-project-react/infra/
-    env_file: .env
-    ports:
-      - 8000:80
-    volumes:
-      - static:/static/
-      - media:/app/media/
-    depends_on:
-      - backend

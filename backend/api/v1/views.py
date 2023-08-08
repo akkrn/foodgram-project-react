@@ -29,6 +29,9 @@ class IngredientViewSet(viewsets.ModelViewSet):
     pass
 
 
+class RecipeViewSet(viewsets.ModelViewSet):
+    pass
+
 class UserViewSet(UserViewSet):
 
     @action(detail=False, methods=['get'],
