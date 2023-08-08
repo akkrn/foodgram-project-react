@@ -28,7 +28,6 @@ Pillow==10.0.0
 platformdirs==3.8.0
 psycopg2-binary==2.9.3
 pycparser==2.21
-PyJWT==2.8.0
 python-dotenv==1.0.0
 python3-openid==3.2.0
 pytz==2023.3
@@ -42,3 +41,4 @@ tomli==2.0.1
 typing_extensions==4.7.1
 urllib3==2.0.4
 yarl==1.9.2
+gunicorn==20.1.0
