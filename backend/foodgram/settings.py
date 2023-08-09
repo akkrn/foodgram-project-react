@@ -157,6 +157,7 @@ DJOSER = {
         "user": "api.v1.serializers.UserSerializer",
     },
     "PERMISSIONS": {
+        "create": ("rest_framework.permissions.AllowAny"),
         "user": ("rest_framework.permissions.IsAuthenticated"),
         "user_delete": ("rest_framework.permissions.IsAdminUser"),
     },
