@@ -12,14 +12,16 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=150, verbose_name="Фамилия")
     is_staff = models.BooleanField(default=False)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ('username', 'first_name', 'last_name', 'password')
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ("username", "first_name", "last_name", "password")
 
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
         constraints = [
-            models.UniqueConstraint(fields=["username", "email"], name="unique_user")
+            models.UniqueConstraint(
+                fields=["username", "email"], name="unique_user"
+            )
         ]
 
     def __str__(self):
@@ -45,7 +47,9 @@ class Follow(models.Model):
         unique_together = ["user", "author"]
 
         constraints = (
-            models.UniqueConstraint(fields=["user", "author"], name="unique_follow"),
+            models.UniqueConstraint(
+                fields=["user", "author"], name="unique_follow"
+            ),
             models.CheckConstraint(
                 check=~Q(user=F("author")), name="prevent_self_follow"
             ),

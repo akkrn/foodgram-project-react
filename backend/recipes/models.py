@@ -12,7 +12,9 @@ class Tag(models.Model):
         DINNER = "dinner", _("Ужин")
 
     name = models.CharField(max_length=15, choices=TagChoice.choices)
-    color = models.CharField(max_length=7, unique=True, verbose_name="Цветовой HEX-код")
+    color = models.CharField(
+        max_length=7, unique=True, verbose_name="Цветовой HEX-код"
+    )
     slug = models.SlugField(
         unique=True,
     )

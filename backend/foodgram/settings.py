@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "django_filters",
-    'rest_framework.authtoken',
+    "rest_framework.authtoken",
     "djoser",
     "users",
     "recipes",
@@ -142,23 +142,24 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.TokenAuthentication",
     ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination"
-                                ".PageNumberPagination",
+    ".PageNumberPagination",
     "PAGE_SIZE": 6,
 }
 
 DJOSER = {
-    'LOGIN_FIELD': 'email',
-    'HIDE_USER': 'True',
-    'SERIALIZERS': {
-        'user': 'api.v1.serializers.UserSerializer',
+    "LOGIN_FIELD": "email",
+    "HIDE_USER": "True",
+    "SERIALIZERS": {
+        "user": "api.v1.serializers.UserSerializer",
     },
-    'PERMISSIONS': {'user': ('rest_framework.permissions.IsAuthenticated'),
-                    'user_delete': ('rest_framework.permissions.IsAdminUser'),
-                    },
+    "PERMISSIONS": {
+        "user": ("rest_framework.permissions.IsAuthenticated"),
+        "user_delete": ("rest_framework.permissions.IsAdminUser"),
+    },
 }
 
 AUTH_USER_MODEL = "users.User"

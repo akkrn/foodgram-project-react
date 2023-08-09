@@ -33,7 +33,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "measure_unit",
-                    models.CharField(max_length=100, verbose_name="Единица измерения"),
+                    models.CharField(
+                        max_length=100, verbose_name="Единица измерения"
+                    ),
                 ),
             ],
             options={
@@ -93,12 +95,16 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "name",
-                    models.CharField(max_length=200, verbose_name="Название рецепта"),
+                    models.CharField(
+                        max_length=200, verbose_name="Название рецепта"
+                    ),
                 ),
                 ("text", models.TextField(verbose_name="Описание рецепта")),
                 (
                     "cooking_time",
-                    models.PositiveIntegerField(verbose_name="Время приготовления"),
+                    models.PositiveIntegerField(
+                        verbose_name="Время приготовления"
+                    ),
                 ),
                 (
                     "created",
@@ -125,7 +131,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "ingredients",
-                    models.ManyToManyField(blank=True, to="recipes.Ingredient"),
+                    models.ManyToManyField(
+                        blank=True, to="recipes.Ingredient"
+                    ),
                 ),
                 ("tags", models.ManyToManyField(blank=True, to="recipes.Tag")),
             ],
