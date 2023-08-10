@@ -21,15 +21,15 @@ services:
       - db
   frontend:
     build:
-      context: ../frontend
+      context: ../foodgram-project-react/frontend
       dockerfile: Dockerfile
     volumes:
-      - ../frontend/:/app/result_build/
+      - ../foodgram-project-react/frontend/:/app/result_build/
   nginx:
     image: nginx:1.19.3
     ports:
       - "8888:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ../frontend/build:/usr/share/nginx/html/
-      - ../docs/:/usr/share/nginx/html/api/docs/
+      - ../foodgram-project-react/infra/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ../foodgram-project-react/frontend/build:/usr/share/nginx/html/
+      - ../foodgram-project-react/docs/:/usr/share/nginx/html/api/docs/
