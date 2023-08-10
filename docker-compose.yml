@@ -12,7 +12,7 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
   backend:
-    build: ../foodgram-project-react/backend/
+    build: ./backend/
     env_file: .env
     volumes:
       - static:/backend_static/
@@ -20,16 +20,19 @@ services:
     depends_on:
       - db
   frontend:
-    build:
-      context: ../foodgram-project-react/frontend
-      dockerfile: Dockerfile
+    env_file: .env
+    image: akkrn/foodgram_frontend
+    command: cp -r --force /app/result_build/. /static/
     volumes:
-      - ../foodgram-project-react/frontend/:/app/result_build/
-  nginx:
-    image: nginx:1.19.3
-    ports:
-      - "8888:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ../frontend/build:/usr/share/nginx/html/
-      - ../foodgram-project-react/docs/:/usr/share/nginx/html/api/docs/
+      - static:/static/
+    gateway:
+      image: akkrn/foodgram_gateway
+      env_file: .env
+      ports:
+        - 8888:80
+      volumes:
+        - static:/static/
+        - media:/app/media/
+        - ./docs/:/usr/share/nginx/html/api/docs/
+      depends_on:
+        - backend
