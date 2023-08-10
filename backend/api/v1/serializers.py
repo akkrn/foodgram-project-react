@@ -2,7 +2,8 @@ import datetime as dt
 
 from django.core.files.base import ContentFile
 from django.utils.baseconv import base64
-from rest_framework import serializers
+from djoser.serializers import UserSerializer
+from rest_framework import serializers, request
 from rest_framework.fields import SerializerMethodField
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
