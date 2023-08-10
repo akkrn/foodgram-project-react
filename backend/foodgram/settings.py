@@ -155,14 +155,14 @@ DJOSER = {
     "HIDE_USER": "True",
     "SERIALIZERS": {
         "user": "api.v1.serializers.UserSerializer",
-	"current_user": "api.v1.serializers.UserSerializer",
+        "current_user": "api.v1.serializers.UserSerializer",
     },
     "PERMISSIONS": {
-        "user": ("rest_framework.permissions.IsAuthenticated"),
-	'user_list': ['rest_framework.permissions.AllowAny'],
-        'user_create': ['rest_framework.permissions.AllowAny'],
-        'token_create': ['rest_framework.permissions.AllowAny'],
-        "user_delete": ("rest_framework.permissions.IsAdminUser"),
+        "user": ("rest_framework.permissions.IsAuthenticated",),
+        "user_list": ("rest_framework.permissions.AllowAny",),
+        "user_create": ("rest_framework.permissions.AllowAny",),
+        "token_create": ("rest_framework.permissions.AllowAny",),
+        "user_delete": ("rest_framework.permissions.IsAdminUser",),
     },
 }
 
