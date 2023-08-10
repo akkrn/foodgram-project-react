@@ -23,6 +23,7 @@ from users.models import User, Follow
 
 class UserSerializer(serializers.ModelSerializer):
     is_subscribed = SerializerMethodField(read_only=True)
+    serializer = UserSerializer(request.user, context={'request': request})
 
     email = serializers.EmailField(
         max_length=254,

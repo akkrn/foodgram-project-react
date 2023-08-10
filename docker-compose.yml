@@ -22,17 +22,17 @@ services:
   frontend:
     env_file: .env
     image: akkrn/foodgram_frontend
-    command: cp -r --force /app/result_build/. /static/
+    command: cp -r --force /app/build/. /static/
     volumes:
       - static:/static/
-    gateway:
-      image: akkrn/foodgram_gateway
-      env_file: .env
-      ports:
-        - 8888:80
-      volumes:
-        - static:/static/
-        - media:/app/media/
-        - ./docs/:/usr/share/nginx/html/api/docs/
-      depends_on:
-        - backend
+  gateway:
+    image: akkrn/foodgram_gateway
+    env_file: .env
+    ports:
+      - 8888:80
+    volumes:
+      - static:/static/
+      - media:/app/media/
+      - ./docs/:/usr/share/nginx/html/api/docs/
+    depends_on:
+      - backend
