@@ -92,7 +92,7 @@ DATABASES = {
         ),
         "HOST": os.getenv(
             "DB_HOST",
-            "localhost",
+            "db",
         ),
         "PORT": os.getenv(
             "DB_PORT",
@@ -160,6 +160,7 @@ DJOSER = {
         "user": ("rest_framework.permissions.IsAuthenticated"),
         'user_list': ['rest_framework.permissions.AllowAny'],
         'user_create': ['rest_framework.permissions.AllowAny'],
+        'token_create': ['rest_framework.permissions.AllowAny'],
         "user_delete": ("rest_framework.permissions.IsAdminUser"),
     },
 }
