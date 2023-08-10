@@ -1,26 +1,21 @@
 import datetime as dt
 
-from django.core.files.base import ContentFile
-from django.http import request
-from django.utils.baseconv import base64
 from djoser.serializers import UserSerializer
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
+from django.core.files.base import ContentFile
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.forms import ValidationError
+from django.http import request
 from django.shortcuts import get_object_or_404
+from django.utils.baseconv import base64
 
 from recipes.models import (
-    Recipe,
-    Ingredient,
-    Tag,
-    RecipeIngredient,
-    Favorite,
-    Wishlist,
+    Favorite, Ingredient, Recipe, RecipeIngredient, Tag, Wishlist,
 )
-from users.models import User, Follow
+from users.models import Follow, User
 
 
 class UserSerializer(serializers.ModelSerializer):

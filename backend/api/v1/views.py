@@ -1,37 +1,28 @@
 from django_filters.rest_framework import (
-    CharFilter,
-    DjangoFilterBackend,
-    FilterSet,
+    CharFilter, DjangoFilterBackend, FilterSet,
 )
+from djoser.views import UserViewSet
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import (
-    AllowAny,
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
+    AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly,
 )
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
-from djoser.views import UserViewSet
 
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 
-from recipes.models import Recipe, Ingredient, Tag
-from users.models import User, Follow
-
-from api.v1.serializers import (
-    UserSerializer,
-    FollowSerializer,
-    TagSerializer,
-    IngredientSerializer,
-)
-
 from api.v1.permissions import IsAdmin
+from api.v1.serializers import (
+    FollowSerializer, IngredientSerializer, TagSerializer, UserSerializer,
+)
+from recipes.models import Ingredient, Recipe, Tag
+from users.models import Follow, User
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
