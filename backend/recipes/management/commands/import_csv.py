@@ -1,5 +1,6 @@
 import logging
 from csv import DictReader
+from django.conf import settings
 
 from django.core.management.base import BaseCommand
 
@@ -46,8 +47,8 @@ class Command(BaseCommand):
             model,
             csv,
         ) in TABLES.items():
-            transform_csv(model, f"../data/{csv}")
-            with open(f"../data/{csv}", encoding="utf-8") as file:
+            transform_csv(model, settings.BASE_DIR/"data"/csv)
+            with open(settings.BASE_DIR/"data"/csv, encoding="utf-8") as file:
                 if model.objects.exists():
                     logging.error("Data already loaded... Exiting.")
                     continue
