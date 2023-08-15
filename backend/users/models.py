@@ -10,7 +10,6 @@ class User(AbstractUser):
     )
     first_name = models.CharField(max_length=30, verbose_name="Имя")
     last_name = models.CharField(max_length=150, verbose_name="Фамилия")
-    is_staff = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ("username", "first_name", "last_name", "password")

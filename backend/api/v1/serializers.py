@@ -13,7 +13,12 @@ from django.shortcuts import get_object_or_404
 from django.utils.baseconv import base64
 
 from recipes.models import (
-    Favorite, Ingredient, Recipe, RecipeIngredient, Tag, Wishlist,
+    Favorite,
+    Ingredient,
+    Recipe,
+    RecipeIngredient,
+    Tag,
+    Wishlist,
 )
 from users.models import Follow, User
 
@@ -119,16 +124,15 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source="ingredient.id", required=False)
-    name = serializers.CharField(source="ingredient.name", read_only=True)
-    measurement_unit = serializers.CharField(
-        source="ingredient.measurement_unit", read_only=True
-    )
     amount = serializers.IntegerField(required=True, min_value=1)
 
     class Meta:
         model = RecipeIngredient
         fields = ("id", "name", "measurement_unit", "amount")
+        read_only_fields = (
+            "name",
+            "measurement_unit",
+        )
 
     def create(self, validated_data):
         ingredient_id = validated_data.pop("ingredient")["id"]
@@ -190,3 +194,7 @@ class RecipeGetSerializer(serializers.ModelSerializer):
             and request.user.is_authenticated
             and Wishlist.objects.filter(user=request.user, recipe=obj).exists()
         )
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+    pass
