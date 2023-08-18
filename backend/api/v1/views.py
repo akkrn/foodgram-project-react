@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
@@ -25,6 +25,7 @@ from api.v1.serializers import (
     IngredientSerializer,
     RecipeSerializer,
     RecipeFollowSerializer,
+    RecipeGetSerializer
 )
 
 from api.v1.permissions import OwnerOnly, IsAdmin
@@ -89,17 +90,22 @@ class IngredientViewSet(viewsets.ModelViewSet):
     filter_backends = (IngredientFilter,)
 
 
-
 class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filter_class = RecipeFilter
     filterset_fields = (
         "author", "tags",
-        #"is_favorited", "is_in_shopping_cart")
+        # "is_favorited", "is_in_shopping_cart")
     )
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
+
+    # serializer_class = RecipeSerializer
+
+    def get_serializer_class(self):
+        if self.action in ["list", "retrieve"]:
+            return RecipeGetSerializer
+        return RecipeSerializer
 
     @action(
         detail=True,
@@ -128,33 +134,36 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
-        detail=True,
+        detail=False,
         methods=["get"],
-        permission_classes=[OwnerOnly],
+        permission_classes=[IsAuthenticated],
     )
-    def download_shopping_cart(self, request, pk):
+    def download_shopping_cart(self, request):
         user = request.user
         ingredients = (
             Wishlist.objects.filter(user=user)
                 .values(
-                "recipe__ingredients__name",
-                "recipe__ingredients__unit",
+                "recipe__recipes_ingredient__ingredient__name",
+                "recipe__recipes_ingredient__ingredient__measurement_unit"
             )
-                .annotate(total_amount=Sum("recipe__ingredients__amount"))
+                .annotate(
+                total_amount=Sum("recipe__recipes_ingredient__amount"))
         )
+        ingredients_str = ("Данный список покупок составлен в сервисе "
+                           "Foodgram\n\n"
+                           "Список покупок:")
+        for ingredient in ingredients:
+            ingredients_list = [
+                f"{ingredient['recipe__recipes_ingredient__ingredient__name']} - "
+                f"{ingredient['total_amount']} "
+                f"{ingredient['recipe__recipes_ingredient__ingredient__measurement_unit']}"
+            ]
+            ingredients_str += "\n"+"\n".join(ingredients_list)
 
-        ingredients_list = [
-            f"{ingredient['recipe__ingredients__name']} - "
-            f"{ingredient['total_amount']} "
-            f"{ingredient['recipe__ingredients__unit']}"
-            for ingredient in ingredients
-        ]
-
-        ingredients_str = "\n".join(ingredients_list)
         response = HttpResponse(ingredients_str, content_type="text/plain")
         response[
             "Content-Disposition"
-        ] = f"attachment; filename=shopping_cart_{datetime.now().strftime('%Y%m%d%H%M%S')}.txt"
+        ] = f"attachment; filename=shopping_cart_{datetime.now().strftime('%Y%m%d')}.txt"
         return response
 
 

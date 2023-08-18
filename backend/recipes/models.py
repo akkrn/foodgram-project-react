@@ -50,7 +50,9 @@ class Recipe(models.Model):
     name = models.CharField("Название рецепта", max_length=200)
     text = models.TextField("Описание рецепта")
     cooking_time = models.PositiveIntegerField("Время приготовления")
-    ingredients = models.ManyToManyField(Ingredient, through="RecipeIngredient", related_name="recipes")
+    ingredients = models.ManyToManyField(Ingredient,
+                                         through="RecipeIngredient",
+                                         related_name="recipes")
     tags = models.ManyToManyField(Tag, blank=False, related_name="recipes")
     created = models.DateTimeField("Дата публикации", auto_now_add=True)
     image = models.ImageField("Картинка", upload_to="recipes/", blank=True)
@@ -65,8 +67,10 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name="ingredient_recipes")
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name="ingredient_recipes")
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
+                               related_name="recipes_ingredient")
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE,
+                                   related_name="recipes_ingredient")
     amount = models.PositiveIntegerField("Количество")
 
     class Meta:
