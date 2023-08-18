@@ -29,10 +29,10 @@ class Tag(models.Model):
 
 class Ingredient(models.Model):
     name = models.CharField("Название ингредиента", max_length=100)
-    measure_unit = models.CharField("Единица измерения", max_length=100)
+    measurement_unit = models.CharField("Единица измерения", max_length=100)
 
     def __str__(self):
-        return self.name + " " + self.measure_unit
+        return self.name + " " + self.measurement_unit
 
     class Meta:
         ordering = ("name",)
@@ -50,8 +50,8 @@ class Recipe(models.Model):
     name = models.CharField("Название рецепта", max_length=200)
     text = models.TextField("Описание рецепта")
     cooking_time = models.PositiveIntegerField("Время приготовления")
-    ingredients = models.ManyToManyField(Ingredient, blank=True)
-    tags = models.ManyToManyField(Tag, blank=True)
+    ingredients = models.ManyToManyField(Ingredient, through="RecipeIngredient", related_name="recipes")
+    tags = models.ManyToManyField(Tag, blank=False, related_name="recipes")
     created = models.DateTimeField("Дата публикации", auto_now_add=True)
     image = models.ImageField("Картинка", upload_to="recipes/", blank=True)
 
@@ -65,8 +65,8 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name="ingredient_recipes")
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name="ingredient_recipes")
     amount = models.PositiveIntegerField("Количество")
 
     class Meta:

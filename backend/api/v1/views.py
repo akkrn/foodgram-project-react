@@ -20,13 +20,15 @@ from users.models import User, Follow
 from api.v1.serializers import (
     UserSerializer,
     FollowSerializer,
+    FollowUserSerializer,
     TagSerializer,
     IngredientSerializer,
     RecipeSerializer,
-    RecipeGetSerializer,
+    RecipeFollowSerializer,
 )
 
 from api.v1.permissions import OwnerOnly, IsAdmin
+from api.v1.filters import IngredientFilter, RecipeFilter
 
 
 class UserViewSet(UserViewSet):
@@ -38,7 +40,7 @@ class UserViewSet(UserViewSet):
     def subscriptions(self, request):
         queryset = Follow.objects.filter(user=request.user)
         page = self.paginate_queryset(queryset)
-        serializer = FollowSerializer(
+        serializer = FollowUserSerializer(
             page,
             many=True,
             context={"request": request},
@@ -54,14 +56,17 @@ class UserViewSet(UserViewSet):
         author = get_object_or_404(User, id=id)
         if request.method == "POST":
             serializer = FollowSerializer(
-                data={"following": author.id, "user": request.user.id}
+                data={"author": author.id, "user": request.user.id},
+                context={"request": request}
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
+            serializer = FollowUserSerializer(author,
+                                              context={"request": request})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif request.method == "DELETE":
             follow = get_object_or_404(
-                Follow, user=request.user, following=author
+                Follow, user=request.user, author=author
             )
             follow.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -71,45 +76,30 @@ class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    pagination_class = None
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
-    queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ("^name",)
+    queryset = Ingredient.objects.all()
+    pagination_class = None
+    filter_backends = (IngredientFilter,)
 
-
-class FollowViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ("following__username",)
-    serializer_class = FollowSerializer
-
-    def get_queryset(self):
-        queryset = Follow.objects.filter(user=self.request.user)
-        return queryset
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
+    filter_class = RecipeFilter
     filterset_fields = (
-    "author", "tags", "is_favorited", "is_in_shopping_cart")
+        "author", "tags",
+        #"is_favorited", "is_in_shopping_cart")
+    )
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
-    def get_serializer_class(self):
-        if self.action in ["list", "retrieve"]:
-            return RecipeGetSerializer
-        return RecipeSerializer
 
     @action(
         detail=True,
@@ -166,3 +156,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             "Content-Disposition"
         ] = f"attachment; filename=shopping_cart_{datetime.now().strftime('%Y%m%d%H%M%S')}.txt"
         return response
+
+
+class FavoriteViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = RecipeFollowSerializer
+    pagination_class = None
+    http_method_names = ["post", "delete"]
+
+    def get_queryset(self):
+        return self.request.user.favorite_subscriber.all()
