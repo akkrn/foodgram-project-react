@@ -21,12 +21,12 @@ services:
       - db
   frontend:
     env_file: .env
-    image: akkrn/foodgram_frontend
+    image: ${DOCKER_USERNAME}/foodgram_frontend
     command: cp -r --force /app/build/. /static/
     volumes:
       - static:/static/
   gateway:
-    image: akkrn/foodgram_gateway
+    image: ${DOCKER_USERNAME}/foodgram_gateway
     env_file: .env
     ports:
       - 8888:80
