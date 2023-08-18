@@ -24,11 +24,10 @@ from api.v1.serializers import (
     TagSerializer,
     IngredientSerializer,
     RecipeSerializer,
-    RecipeFollowSerializer,
-    RecipeGetSerializer
+    RecipeAnswerSerializer,
+    RecipeGetSerializer,
 )
 
-from api.v1.permissions import OwnerOnly, IsAdmin
 from api.v1.filters import IngredientFilter, RecipeFilter
 
 
@@ -36,7 +35,6 @@ class UserViewSet(UserViewSet):
     @action(
         detail=False,
         methods=["get"],
-        permission_classes=[IsAuthenticated],
     )
     def subscriptions(self, request):
         queryset = Follow.objects.filter(user=request.user)
@@ -51,19 +49,19 @@ class UserViewSet(UserViewSet):
     @action(
         detail=True,
         methods=["post", "delete"],
-        permission_classes=[IsAuthenticated],
     )
     def subscribe(self, request, id):
         author = get_object_or_404(User, id=id)
         if request.method == "POST":
             serializer = FollowSerializer(
                 data={"author": author.id, "user": request.user.id},
-                context={"request": request}
+                context={"request": request},
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            serializer = FollowUserSerializer(author,
-                                              context={"request": request})
+            serializer = FollowUserSerializer(
+                author, context={"request": request}
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif request.method == "DELETE":
             follow = get_object_or_404(
@@ -95,12 +93,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filter_class = RecipeFilter
     filterset_fields = (
-        "author", "tags",
+        "author",
+        "tags",
         # "is_favorited", "is_in_shopping_cart")
     )
     queryset = Recipe.objects.all()
-
-    # serializer_class = RecipeSerializer
 
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:
@@ -110,7 +107,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=["post", "delete"],
-        permission_classes=[IsAuthenticated],
     )
     def favorite(self, request, pk):
         return self._toggle_relation(Favorite, request, pk)
@@ -125,10 +121,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def _toggle_relation(self, model, request, pk):
         recipe = get_object_or_404(Recipe, id=pk)
+        serializer = RecipeAnswerSerializer(
+            recipe, context={"request": request}
+        )
         user = request.user
         if request.method == "POST":
             model.objects.get_or_create(user=user, recipe=recipe)
-            return Response({"success": True}, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif request.method == "DELETE":
             model.objects.filter(user=user, recipe=recipe).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -142,23 +141,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = request.user
         ingredients = (
             Wishlist.objects.filter(user=user)
-                .values(
+            .values(
                 "recipe__recipes_ingredient__ingredient__name",
-                "recipe__recipes_ingredient__ingredient__measurement_unit"
+                "recipe__recipes_ingredient__ingredient__measurement_unit",
             )
-                .annotate(
-                total_amount=Sum("recipe__recipes_ingredient__amount"))
+            .annotate(total_amount=Sum("recipe__recipes_ingredient__amount"))
         )
-        ingredients_str = ("Данный список покупок составлен в сервисе "
-                           "Foodgram\n\n"
-                           "Список покупок:")
+        ingredients_str = (
+            "Данный список покупок составлен в сервисе "
+            "Foodgram\n\n"
+            "Список покупок:"
+        )
         for ingredient in ingredients:
             ingredients_list = [
                 f"{ingredient['recipe__recipes_ingredient__ingredient__name']} - "
                 f"{ingredient['total_amount']} "
                 f"{ingredient['recipe__recipes_ingredient__ingredient__measurement_unit']}"
             ]
-            ingredients_str += "\n"+"\n".join(ingredients_list)
+            ingredients_str += "\n" + "\n".join(ingredients_list)
 
         response = HttpResponse(ingredients_str, content_type="text/plain")
         response[
@@ -168,10 +168,18 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
 
 class FavoriteViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
-    serializer_class = RecipeFollowSerializer
+    serializer_class = RecipeAnswerSerializer
     pagination_class = None
     http_method_names = ["post", "delete"]
 
     def get_queryset(self):
         return self.request.user.favorite_subscriber.all()
+
+
+class WishlistViewSet(viewsets.ModelViewSet):
+    serializer_class = RecipeAnswerSerializer
+    pagination_class = None
+    http_method_names = ["post", "delete"]
+
+    def get_queryset(self):
+        return self.request.user.wishlist_subscriber.all()
