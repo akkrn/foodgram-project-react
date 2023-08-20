@@ -95,7 +95,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filterset_fields = (
         "author",
         "tags",
-        # "is_favorited", "is_in_shopping_cart")
     )
     queryset = Recipe.objects.all()
 

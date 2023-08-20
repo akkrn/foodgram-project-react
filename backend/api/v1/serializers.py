@@ -247,6 +247,8 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, data):
+        if self.instance:
+            return data
         name = data.get("name")
         existing_recipe = Recipe.objects.filter(name=name).first()
         if existing_recipe:
@@ -310,7 +312,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     def update(self, recipe, validated_data):
         if validated_data.get("ingredients"):
             ingredients = validated_data.pop("ingredients")
-            recipe.ingredient_recipes.all().delete()
+            recipe.recipes_ingredient.all().delete()
             self.create_ingredient(recipe, ingredients)
         tags = validated_data.pop("tags")
         recipe.tags.set(tags)
