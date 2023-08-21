@@ -3,6 +3,16 @@ from django_filters.rest_framework import FilterSet, filters
 from recipes.models import Recipe, Tag
 
 
+class IngredientFilter(FilterSet):
+    name = filters.CharFilter(
+        field_name="name", lookup_expr="istartswith"
+    )
+
+    class Meta:
+        model = Recipe
+        fields = ("name",)
+
+
 class RecipeFilter(FilterSet):
     tags = filters.ModelMultipleChoiceFilter(
         queryset=Tag.objects.all(),

@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404
 from recipes.models import Favorite, Ingredient, Recipe, Tag, Wishlist
 from users.models import Follow, User
 
-from .filters import RecipeFilter
+from .filters import RecipeFilter, IngredientFilter
 from .serializers import (
     FollowSerializer, FollowUserSerializer, IngredientSerializer,
     RecipeAnswerSerializer, RecipeGetSerializer, RecipeSerializer,
@@ -80,6 +80,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
     search_fields = ("^name",)
     queryset = Ingredient.objects.all()
     pagination_class = None
+    filterset_class = IngredientFilter
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
