@@ -1,7 +1,8 @@
-import requests
 import base64
-import pyperclip
 from urllib.parse import urlparse, urlsplit
+
+import pyperclip
+import requests
 
 
 def url_to_base64(url):

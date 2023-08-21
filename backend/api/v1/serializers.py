@@ -1,17 +1,11 @@
+from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SerializerMethodField
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
-from drf_base64.fields import Base64ImageField
-
 from recipes.models import (
-    Favorite,
-    Ingredient,
-    Recipe,
-    RecipeIngredient,
-    Tag,
-    Wishlist,
+    Favorite, Ingredient, Recipe, RecipeIngredient, Tag, Wishlist,
 )
 from users.models import Follow, User
 

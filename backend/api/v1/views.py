@@ -1,34 +1,26 @@
 from datetime import datetime
 
-from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import UserViewSet
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
+    IsAuthenticated, IsAuthenticatedOrReadOnly,
 )
 from rest_framework.response import Response
-from djoser.views import UserViewSet
 
 from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 
-from recipes.models import Recipe, Ingredient, Tag, Favorite, Wishlist
-from users.models import User, Follow
-
+from api.v1.filters import RecipeFilter
 from api.v1.serializers import (
-    UserSerializer,
-    FollowSerializer,
-    FollowUserSerializer,
-    TagSerializer,
-    IngredientSerializer,
-    RecipeSerializer,
-    RecipeAnswerSerializer,
-    RecipeGetSerializer,
+    FollowSerializer, FollowUserSerializer, IngredientSerializer,
+    RecipeAnswerSerializer, RecipeGetSerializer, RecipeSerializer,
+    TagSerializer, UserSerializer,
 )
-
-from api.v1.filters import IngredientFilter, RecipeFilter
+from recipes.models import Favorite, Ingredient, Recipe, Tag, Wishlist
+from users.models import Follow, User
 
 
 class UserViewSet(UserViewSet):
@@ -37,7 +29,7 @@ class UserViewSet(UserViewSet):
         methods=["get"],
     )
     def subscriptions(self, request):
-        queryset = Follow.objects.filter(user=request.user)
+        queryset = User.objects.filter(following__user=request.user.id)
         page = self.paginate_queryset(queryset)
         serializer = FollowUserSerializer(
             page,
@@ -85,17 +77,13 @@ class IngredientViewSet(viewsets.ModelViewSet):
     search_fields = ("^name",)
     queryset = Ingredient.objects.all()
     pagination_class = None
-    filter_backends = (IngredientFilter,)
+    # filter_backends = (IngredientFilter,)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
-    filter_class = RecipeFilter
-    filterset_fields = (
-        "author",
-        "tags",
-    )
+    filterset_class = RecipeFilter
     queryset = Recipe.objects.all()
 
     def get_serializer_class(self):
@@ -166,19 +154,19 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return response
 
 
-class FavoriteViewSet(viewsets.ModelViewSet):
-    serializer_class = RecipeAnswerSerializer
-    pagination_class = None
-    http_method_names = ["post", "delete"]
-
-    def get_queryset(self):
-        return self.request.user.favorite_subscriber.all()
-
-
-class WishlistViewSet(viewsets.ModelViewSet):
-    serializer_class = RecipeAnswerSerializer
-    pagination_class = None
-    http_method_names = ["post", "delete"]
-
-    def get_queryset(self):
-        return self.request.user.wishlist_subscriber.all()
+# class FavoriteViewSet(viewsets.ModelViewSet):
+#     serializer_class = RecipeAnswerSerializer
+#     pagination_class = None
+#     http_method_names = ["post", "delete"]
+#
+#     def get_queryset(self):
+#         return self.request.user.favorite_subscriber.all()
+#
+#
+# class WishlistViewSet(viewsets.ModelViewSet):
+#     serializer_class = RecipeAnswerSerializer
+#     pagination_class = None
+#     http_method_names = ["post", "delete"]
+#
+#     def get_queryset(self):
+#         return self.request.user.wishlist_subscriber.all()
