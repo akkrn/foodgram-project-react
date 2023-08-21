@@ -1,8 +1,6 @@
-from datetime import datetime
-
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from rest_framework import filters, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (
     IsAuthenticated, IsAuthenticatedOrReadOnly,
@@ -128,13 +126,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     )
     def download_shopping_cart(self, request):
         user = request.user
+        fill_line = "recipe__recipes_ingredient__ingredient__"
         ingredients = (
-            Wishlist.objects.filter(user=user)
-                .values(
-                "recipe__recipes_ingredient__ingredient__name",
-                "recipe__recipes_ingredient__ingredient__measurement_unit",
-            )
-                .annotate(
+            Wishlist.objects.filter(user=user).values(
+                f"{fill_line}name",
+                f"{fill_line}measurement_unit",
+            ).annotate(
                 total_amount=Sum("recipe__recipes_ingredient__amount"))
         )
         ingredients_str = (
@@ -144,14 +141,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
         for ingredient in ingredients:
             ingredients_list = [
-                f"{ingredient['recipe__recipes_ingredient__ingredient__name']} - "
+                f"{ingredient[f'{fill_line}name']} - "
                 f"{ingredient['total_amount']} "
-                f"{ingredient['recipe__recipes_ingredient__ingredient__measurement_unit']}"
+                f"{ingredient[f'{fill_line}measurement_unit']}"
             ]
             ingredients_str += "\n" + "\n".join(ingredients_list)
 
         response = HttpResponse(ingredients_str, content_type="text/plain")
         response[
             "Content-Disposition"
-        ] = f"attachment; filename=shopping_cart_{datetime.now().strftime('%Y%m%d')}.txt"
+        ] = "attachment; filename=shopping_cart.txt"
         return response
