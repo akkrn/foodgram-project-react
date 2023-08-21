@@ -1,9 +1,8 @@
 from datetime import datetime
 
-from django_filters.rest_framework import DjangoFilterBackend, filters
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
-from filters import RecipeFilter
-from rest_framework import status, viewsets
+from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (
     IsAuthenticated, IsAuthenticatedOrReadOnly,
@@ -17,6 +16,7 @@ from django.shortcuts import get_object_or_404
 from recipes.models import Favorite, Ingredient, Recipe, Tag, Wishlist
 from users.models import Follow, User
 
+from .filters import RecipeFilter
 from .serializers import (
     FollowSerializer, FollowUserSerializer, IngredientSerializer,
     RecipeAnswerSerializer, RecipeGetSerializer, RecipeSerializer,
