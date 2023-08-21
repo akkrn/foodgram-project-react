@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend, filters
 from djoser.views import UserViewSet
 from filters import RecipeFilter
-from rest_framework import filters, status, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (
     IsAuthenticated, IsAuthenticatedOrReadOnly,
