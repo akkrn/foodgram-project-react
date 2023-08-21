@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404
 from recipes.models import Favorite, Ingredient, Recipe, Tag, Wishlist
 from users.models import Follow, User
 
-from .filters import RecipeFilter, IngredientFilter
+from .filters import IngredientFilter, RecipeFilter
 from .serializers import (
     FollowSerializer, FollowUserSerializer, IngredientSerializer,
     RecipeAnswerSerializer, RecipeGetSerializer, RecipeSerializer,
