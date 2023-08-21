@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
+from filters import RecipeFilter
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (
@@ -13,14 +14,14 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 
-from api.v1.filters import RecipeFilter
-from api.v1.serializers import (
-    FollowSerializer, FollowUserSerializer, IngredientSerializer,
-    RecipeAnswerSerializer, RecipeGetSerializer, RecipeSerializer,
-    TagSerializer, UserSerializer,
-)
 from recipes.models import Favorite, Ingredient, Recipe, Tag, Wishlist
 from users.models import Follow, User
+
+from .serializers import (
+    FollowSerializer, FollowUserSerializer, IngredientSerializer,
+    RecipeAnswerSerializer, RecipeGetSerializer, RecipeSerializer,
+    TagSerializer,
+)
 
 
 class UserViewSet(UserViewSet):
@@ -29,7 +30,9 @@ class UserViewSet(UserViewSet):
         methods=["get"],
     )
     def subscriptions(self, request):
-        queryset = User.objects.filter(following__user=request.user.id)
+        queryset = User.objects.filter(
+            following__user=request.user.id
+        ).order_by("id")
         page = self.paginate_queryset(queryset)
         serializer = FollowUserSerializer(
             page,
@@ -77,7 +80,6 @@ class IngredientViewSet(viewsets.ModelViewSet):
     search_fields = ("^name",)
     queryset = Ingredient.objects.all()
     pagination_class = None
-    # filter_backends = (IngredientFilter,)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -128,11 +130,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
         user = request.user
         ingredients = (
             Wishlist.objects.filter(user=user)
-            .values(
+                .values(
                 "recipe__recipes_ingredient__ingredient__name",
                 "recipe__recipes_ingredient__ingredient__measurement_unit",
             )
-            .annotate(total_amount=Sum("recipe__recipes_ingredient__amount"))
+                .annotate(
+                total_amount=Sum("recipe__recipes_ingredient__amount"))
         )
         ingredients_str = (
             "Данный список покупок составлен в сервисе "
@@ -152,21 +155,3 @@ class RecipeViewSet(viewsets.ModelViewSet):
             "Content-Disposition"
         ] = f"attachment; filename=shopping_cart_{datetime.now().strftime('%Y%m%d')}.txt"
         return response
-
-
-# class FavoriteViewSet(viewsets.ModelViewSet):
-#     serializer_class = RecipeAnswerSerializer
-#     pagination_class = None
-#     http_method_names = ["post", "delete"]
-#
-#     def get_queryset(self):
-#         return self.request.user.favorite_subscriber.all()
-#
-#
-# class WishlistViewSet(viewsets.ModelViewSet):
-#     serializer_class = RecipeAnswerSerializer
-#     pagination_class = None
-#     http_method_names = ["post", "delete"]
-#
-#     def get_queryset(self):
-#         return self.request.user.wishlist_subscriber.all()

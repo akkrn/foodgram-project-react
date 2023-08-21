@@ -58,10 +58,9 @@ class RecipeAnswerSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "image", "cooking_time")
 
 
-class FollowUserSerializer(serializers.ModelSerializer):
+class FollowUserSerializer(UserSerializer):
     recipes_count = SerializerMethodField(read_only=True)
-    recipes = RecipeAnswerSerializer(many=True, read_only=True)
-    is_subscribed = SerializerMethodField(read_only=True)
+    recipes = SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
@@ -76,16 +75,20 @@ class FollowUserSerializer(serializers.ModelSerializer):
             "recipes_count",
         )
 
+    def get_recipes(self, obj):
+        request = self.context.get("request")
+        recipes_limit = None
+        if request:
+            recipes_limit = request.query_params.get("recipes_limit")
+        recipes = obj.recipes.all()
+        if recipes_limit:
+            recipes = obj.recipes.all()[: int(recipes_limit)]
+        return RecipeAnswerSerializer(
+            recipes, many=True, context={"request": request}
+        ).data
+
     def get_recipes_count(self, data):
         return Recipe.objects.filter(author=data.id).count()
-
-    def get_is_subscribed(self, data):
-        request = self.context.get("request")
-        if request is None or request.user.is_anonymous:
-            return False
-        return Follow.objects.filter(
-            user=request.user, author=data.id
-        ).exists()
 
 
 class FollowSerializer(serializers.ModelSerializer):
@@ -267,8 +270,6 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def validate_ingredient(self, data):
         ingredients = data.get("ingredients")
-        name = data.get("name")
-
         unique_ingredients = []
         for ingredient in ingredients:
             ingredient_id = ingredient.get("id")
