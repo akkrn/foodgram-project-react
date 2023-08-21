@@ -76,11 +76,10 @@ class TagViewSet(viewsets.ModelViewSet):
 class IngredientViewSet(viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    filter_backends = (filters.SearchFilter,)
+    filter_backends = (IngredientFilter,)
     search_fields = ("^name",)
     queryset = Ingredient.objects.all()
     pagination_class = None
-    filterset_class = IngredientFilter
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
