@@ -1,10 +1,11 @@
 import logging
 from csv import DictReader
+from typing import Any
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from ...models import Ingredient
+from recipes.models import Ingredient
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -19,13 +20,13 @@ TABLES = {
 }
 
 
-def generate_csv_headers(model):
+def generate_csv_headers(model: Any) -> list[str]:
     fields = model._meta.fields
     headers = [field.name for field in fields if field.name not in ["id"]]
     return headers
 
 
-def transform_csv(model, csv_path):
+def transform_csv(model: Any, csv_path: str) -> None:
     headers = generate_csv_headers(model)
     with open(csv_path, "r", encoding="utf-8") as file:
         data = file.readlines()
@@ -42,7 +43,7 @@ def transform_csv(model, csv_path):
 class Command(BaseCommand):
     help = "Import from csv to db"
 
-    def handle(self, *args, **kwargs):
+    def handle(self, *args, **kwargs) -> None:
         for (
             model,
             csv,

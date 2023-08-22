@@ -14,3 +14,7 @@ class UserAdmin(admin.ModelAdmin):
 class FollowAdmin(admin.ModelAdmin):
     list_display = ["user", "author"]
     search_fields = ["user__username", "author__username"]
+
+    def get_queryset(self, request: admin.ModelAdmin) -> Follow:
+        qs = super().get_queryset(request)
+        return qs.select_related("user", "author")

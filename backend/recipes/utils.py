@@ -1,13 +1,17 @@
 import base64
+from http import HTTPStatus
+from io import BytesIO
 from urllib.parse import urlparse, urlsplit
 
 import pyperclip
 import requests
 
+from recipes.models import Ingredient
 
-def url_to_base64(url):
+
+def url_to_base64(url: str) -> str or None:
     response = requests.get(url)
-    if response.status_code == 200:
+    if response.status_code == HTTPStatus.OK:
         content_type = response.headers.get("content-type")
         if not content_type:
             path = urlparse(url).path
@@ -20,15 +24,29 @@ def url_to_base64(url):
         )
 
         pyperclip.copy(base64_string)
-        print("Base64 строка скопирована в буфер обмена!")
         return base64_string
-    else:
-        print(
-            f"Ошибка {response.status_code}: Не получилось достать "
-            f"изображение."
-        )
-        return None
+    return None
 
 
-image_url = "https://www.gastronom.ru/binfiles/images/20230421/b5aa6302.jpg"
-base64_string = url_to_base64(image_url)
+def generate_shopping_cart(ingredients: Ingredient) -> BytesIO:
+    ingredients_str = (
+        "Данный список покупок составлен в сервисе "
+        "Foodgram\n\n"
+        "Список покупок:"
+    )
+    for ingredient in ingredients:
+        ingredient_name = ingredient[
+            "recipe__recipes_ingredient__ingredient__name"
+        ]
+        total_amount = ingredient["total_amount"]
+        measurement_unit = ingredient[
+            "recipe__recipes_ingredient__ingredient__measurement_unit"
+        ]
+        ingredients_list = [
+            f"{ingredient_name} - {total_amount} {measurement_unit}"
+        ]
+        ingredients_str += "\n" + "\n".join(ingredients_list)
+    buffer = BytesIO()
+    buffer.write(ingredients_str.encode())
+    buffer.seek(0)
+    return buffer

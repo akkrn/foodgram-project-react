@@ -12,10 +12,8 @@ SECRET_KEY = os.getenv(
     default="SUP3R-S3CR3T-K3Y-F0R-MY-PR0J3CT",
 )
 
-DEBUG = os.getenv(
-    "DEBUG",
-    default=False,
-)
+DEBUG = False if os.getenv("DEBUG", default="False") == "False" else True
+
 
 ALLOWED_HOSTS = os.getenv(
     "ALLOWED_HOSTS",
@@ -32,11 +30,11 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "djoser",
+    "django_filters",
+    "sorl.thumbnail",
     "users",
     "recipes",
     "api",
-    "django_filters",
-    "sorl.thumbnail",
 ]
 
 MIDDLEWARE = [
