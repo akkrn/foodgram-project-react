@@ -39,7 +39,7 @@ class UserViewSet(UserViewSet):
         queryset = (
             User.objects.filter(following__user=request.user.id)
             .order_by("id")
-            .anotate(recipes_count=Count("recipes"))
+            .annotate(recipes_count=Count("recipes"))
         )
         page = self.paginate_queryset(queryset)
         serializer = FollowUserSerializer(
@@ -94,9 +94,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    queryset = Recipe.objects.select_related(
-        "author"
-    ).prefetch_related("tags", "ingredients")
+    queryset = Recipe.objects.select_related("author").prefetch_related(
+        "tags", "ingredients"
+    )
 
     def get_serializer_class(self) -> RecipeSerializer:
         if self.action in ["list", "retrieve"]:
@@ -107,21 +107,21 @@ class RecipeViewSet(viewsets.ModelViewSet):
         detail=True,
         methods=["post", "delete"],
     )
-    def favorite(self, request: HttpResponse, id: int) -> HttpResponse:
-        return self._toggle_relation(Favorite, request, id)
+    def favorite(self, request: HttpResponse, pk: int) -> HttpResponse:
+        return self._toggle_relation(Favorite, request, pk)
 
     @action(
         detail=True,
         methods=["post", "delete"],
         permission_classes=[IsAuthenticated],
     )
-    def shopping_cart(self, request: HttpResponse, id: int) -> HttpResponse:
-        return self._toggle_relation(Wishlist, request, id)
+    def shopping_cart(self, request: HttpResponse, pk: int) -> HttpResponse:
+        return self._toggle_relation(Wishlist, request, pk)
 
     def _toggle_relation(
-        self, model: Any, request: HttpResponse, id: int
+        self, model: Any, request: HttpResponse, pk: int
     ) -> HttpResponse:
-        recipe = get_object_or_404(Recipe, id=id)
+        recipe = get_object_or_404(Recipe, id=pk)
         serializer = RecipeAnswerSerializer(
             recipe, context={"request": request}
         )
