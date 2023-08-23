@@ -69,7 +69,7 @@ class UserViewSet(UserViewSet):
         elif request.method == "DELETE":
             if Follow.objects.filter(
                 author=author, user=request.user
-            ).delete():
+            ).delete()[0]:
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -130,7 +130,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             model.objects.get_or_create(user=user, recipe=recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         elif request.method == "DELETE":
-            if model.objects.filter(user=user, recipe=recipe).delete():
+            if model.objects.filter(user=user, recipe=recipe).delete()[0]:
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(status=status.HTTP_404_NOT_FOUND)
 
