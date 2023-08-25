@@ -5,12 +5,7 @@ from rest_framework.fields import SerializerMethodField
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
 from recipes.models import (
-    Favorite,
-    Ingredient,
-    Recipe,
-    RecipeIngredient,
-    Tag,
-    Wishlist,
+    Favorite, Ingredient, Recipe, RecipeIngredient, Tag, Wishlist,
 )
 from users.models import Follow, User
 

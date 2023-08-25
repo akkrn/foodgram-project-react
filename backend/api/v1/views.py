@@ -5,29 +5,24 @@ from djoser.views import UserViewSet
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
+    IsAuthenticated, IsAuthenticatedOrReadOnly,
 )
 from rest_framework.response import Response
 
-from django.db.models import Sum, Count
+from django.db.models import Count, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 
 from recipes.models import Favorite, Ingredient, Recipe, Tag, Wishlist
+from recipes.utils import generate_shopping_cart
 from users.models import Follow, User
 
 from .filters import IngredientFilter, RecipeFilter
 from .serializers import (
-    FollowSerializer,
-    FollowUserSerializer,
-    IngredientSerializer,
-    RecipeAnswerSerializer,
-    RecipeGetSerializer,
-    RecipeSerializer,
+    FollowSerializer, FollowUserSerializer, IngredientSerializer,
+    RecipeAnswerSerializer, RecipeGetSerializer, RecipeSerializer,
     TagSerializer,
 )
-from recipes.utils import generate_shopping_cart
 
 
 class UserViewSet(UserViewSet):

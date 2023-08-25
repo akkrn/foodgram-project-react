@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "djoser",
     "django_filters",
     "sorl.thumbnail",
+    "djaa_list_filter",
     "users",
     "recipes",
     "api",

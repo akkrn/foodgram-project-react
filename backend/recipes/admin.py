@@ -1,12 +1,9 @@
+from djaa_list_filter.admin import AjaxAutocompleteListFilterModelAdmin
+
 from django.contrib import admin
 
 from .models import (
-    Favorite,
-    Ingredient,
-    Recipe,
-    RecipeIngredient,
-    Tag,
-    Wishlist,
+    Favorite, Ingredient, Recipe, RecipeIngredient, Tag, Wishlist,
 )
 
 
@@ -21,13 +18,14 @@ class RecipeIngredientInline(admin.TabularInline):
 
 
 @admin.register(Recipe)
-class RecipeAdmin(admin.ModelAdmin):
+class RecipeAdmin(AjaxAutocompleteListFilterModelAdmin):
     list_display = ["name", "author", "cooking_time", "count_favorites"]
     search_fields = ["name", "author__username"]
-    list_filter = ["author", "tags", "ingredients"]
+    autocomplete_list_filter = ("author", "tags")
     inlines = [
         RecipeIngredientInline,
     ]
+    autocomplete_list_filter = ("author", "tags")
 
     def count_favorites(self, obj: Recipe) -> int:
         return Favorite.objects.filter(recipe=obj).count()
@@ -36,14 +34,15 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request: admin.ModelAdmin) -> Recipe:
         qs = super().get_queryset(request)
-        return qs.selected_related("author").prefetch_related(
+        return qs.select_related("author").prefetch_related(
             "tags", "ingredients"
         )
 
 
 @admin.register(RecipeIngredient)
-class RecipeIngredientAdmin(admin.ModelAdmin):
+class RecipeIngredientAdmin(AjaxAutocompleteListFilterModelAdmin):
     list_display = ("recipe", "ingredient", "amount")
+    autocomplete_list_filter = ("recipe", "ingredient")
     search_fields = ("recipe__name", "ingredient__name")
 
     def get_queryset(self, request: admin.ModelAdmin) -> RecipeIngredient:
@@ -58,8 +57,9 @@ class IngredientAdmin(admin.ModelAdmin):
 
 
 @admin.register(Favorite)
-class FavoriteAdmin(admin.ModelAdmin):
+class FavoriteAdmin(AjaxAutocompleteListFilterModelAdmin):
     list_display = ["user", "recipe"]
+    autocomplete_list_filter = ("user", "recipe")
     search_fields = ["user__username", "recipe__name"]
 
     def get_queryset(self, request: admin.ModelAdmin) -> Favorite:
@@ -68,8 +68,9 @@ class FavoriteAdmin(admin.ModelAdmin):
 
 
 @admin.register(Wishlist)
-class WishlistAdmin(admin.ModelAdmin):
+class WishlistAdmin(AjaxAutocompleteListFilterModelAdmin):
     list_display = ["user", "recipe"]
+    autocomplete_list_filter = ("user", "recipe")
     search_fields = ["user__username", "recipe__name"]
 
     def get_queryset(self, request: admin.ModelAdmin) -> Wishlist:
