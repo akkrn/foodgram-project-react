@@ -1,12 +1,4 @@
-<details open><summary><h2>🔑 Credentials</h2></summary>
-Login: admin@mail.ru
-  
-Password: admin
-
-Domain: https://gramfood.sytes.net/ (http://158.160.67.246:8888/)
-
-</details>
-<details><summary><h2>📚 Description</h2></summary>
+<details open><summary><h2>📚 Description</h2></summary>
 This project, named 'foodgram', serves as a culinary companion for users. It's a platform where users can share their recipes, bookmark others' recipes as favorites, and follow the publications of different authors. Additionally, the website offers a 'WishList' service, enabling users to curate a list of ingredients required for their chosen dishes and even download it for convenience
 
 </details>
